@@ -70,17 +70,18 @@ class Board:
         return 0 <= col < self.cols and 0 <= row < self.rows
 
     def neighbors(self, col: int, row: int) -> List[Tuple[int, int]]:
-        # TODO: Return list of valid neighboring coordinates around (col,row).
-        # deltas = [
-        #     (-1, -1), (0, -1), (1, -1),
-        #     (-1, 0),            (1, 0),
-        #     (-1, 1),  (0, 1),  (1, 1),
-        # ]
-        # result = []
-        
-        # return result
-        pass
-
+        deltas = [
+            (-1, -1), (0, -1), (1, -1),
+            (-1,  0),           (1, 0),
+            (-1,  1), (0, 1),  (1, 1),
+        ]
+        results = []
+        for dx, dy in deltas:
+            nc, nr = col + dx, row + dy
+            if self.is_inbounds(nc, nr):
+                results.append((nc, nr))
+        return results
+    
     def place_mines(self, safe_col: int, safe_row: int) -> None:
         # TODO: Place mines randomly, guaranteeing the first click and its neighbors are safe. And Compute adjacency counts
         # all_positions = [(c, r) for r in range(self.rows) for c in range(self.cols)]
