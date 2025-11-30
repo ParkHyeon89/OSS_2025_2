@@ -160,8 +160,7 @@ class Board:
         cell.is_flagged = not cell.is_flagged
 
     def flagged_count(self) -> int:
-        # TODO: Return current number of flagged cells.
-        pass
+      return sum(cell.state.is_flagged for cell in self.cells)
 
     def _reveal_all_mines(self) -> None:
         """Reveal all mines; called on game over."""
