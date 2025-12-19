@@ -201,7 +201,10 @@ class Game:
             self.highlight_targets.clear()
         self.screen.fill(config.color_bg)
         remaining = max(0, config.num_mines - self.board.flagged_count())
-        time_text = self._format_time(self._elapsed_ms())
+        elapsed_ms = self._elapsed_ms()
+        time_text = self._format_time(elapsed_ms)
+        total_seconds = elapsed_ms // 1000
+        time_text = f"{time_text} ({total_seconds}s)"
         self.renderer.draw_header(remaining, time_text)
         now = pygame.time.get_ticks()
         for r in range(self.board.rows):
