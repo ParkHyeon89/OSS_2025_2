@@ -161,11 +161,20 @@ class Game:
         self.started = False
         self.start_ticks_ms = 0
         self.end_ticks_ms = 0
+        self.difficulty = "normal"
 
     def reset(self):
         """Reset the game state and start a new board."""
-        self.board = Board(config.cols, config.rows, config.num_mines)
-        self.renderer.board = self.board
+        cols, rows, mines = config.DIFFICULTIES[self.difficulty]
+        config.cols = cols
+        config.rows = rows
+        config.num_mines = mines
+        config.width = config.margin_left + cols * config.cell_size + config.margin_right
+        config.height = config.margin_top + rows * config.cell_size + config.margin_bottom
+        config.display_dimension = (config.width, config.height)
+        self.screen = pygame.display.set_mode(config.display_dimension)
+        self.board = Board(cols, rows, mines)
+        self.renderer = Renderer(self.screen, self.board)
         self.highlight_targets.clear()
         self.highlight_until_ms = 0
         self.started = False
@@ -221,6 +230,15 @@ class Game:
                 return False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
+                    self.reset()
+                if event.key == pygame.K_1:
+                    self.difficulty = "easy"
+                    self.reset()
+                if event.key == pygame.K_2:
+                    self.difficulty = "normal"
+                    self.reset()
+                if event.key == pygame.K_3:
+                    self.difficulty = "hard"
                     self.reset()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.input.handle_mouse(event.pos, event.button)
