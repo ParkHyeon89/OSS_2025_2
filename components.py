@@ -52,7 +52,7 @@ class Board:
     - Toggle flags, check win/lose conditions
     """
 
-    def __init__(self, cols: int, rows: int, mines: int):
+    def __init__(self, cols: int, rows: int, mines: int, parent):
         self.cols = cols
         self.rows = rows
         self.num_mines = mines
@@ -61,6 +61,7 @@ class Board:
         self.revealed_count = 0
         self.game_over = False
         self.win = False
+        self.parent = parent
 
     def index(self, col: int, row: int) -> int:
         """Return the flat list index for (col,row)."""

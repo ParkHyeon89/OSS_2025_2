@@ -9,6 +9,7 @@ This module owns:
 The logic lives in components.Board; this module should not implement rules.
 """
 
+import os
 import sys
 
 import pygame
@@ -17,6 +18,7 @@ import config
 from components import Board
 from pygame.locals import Rect
 
+file_path = os.path.join(os.path.dirname(__file__), "highscore.txt")
 
 class Renderer:
     """Draws the Minesweeper UI.
@@ -25,9 +27,10 @@ class Renderer:
     and end-of-game overlays with a semi-transparent background.
     """
 
-    def __init__(self, screen: pygame.Surface, board: Board):
+    def __init__(self, screen: pygame.Surface, board: Board, highscore):
         self.screen = screen
         self.board = board
+        self.highscore = highscore
         self.font = pygame.font.Font(config.font_name, config.font_size)
         self.header_font = pygame.font.Font(config.font_name, config.header_font_size)
         self.result_font = pygame.font.Font(config.font_name, config.result_font_size)
@@ -85,8 +88,7 @@ class Renderer:
         self.screen.blit(left_label, (10, 12))
         self.screen.blit(right_label, (config.width - right_label.get_width() - 10, 12))
 
-    def draw_result_overlay(self, text: str | None) -> None:
-        """Draw a semi-transparent overlay with centered result text, if any."""
+    def draw_result_overlay(self, text):
         if not text:
             return
         overlay = pygame.Surface((config.width, config.height), pygame.SRCALPHA)
@@ -95,7 +97,16 @@ class Renderer:
         label = self.result_font.render(text, True, config.color_result)
         rect = label.get_rect(center=(config.width // 2, config.height // 2))
         self.screen.blit(label, rect)
-
+        if text == "GAME CLEAR" and self.highscore is not None:
+            hs = self.highscore
+            mm = int(hs // 60)
+            ss = int(hs % 60)
+            score_text = f"High Score: {mm:02}m {ss:02}s"
+            sub_label = self.font.render(score_text, True, config.color_result)  # ← 색 변경!
+            sub_rect = sub_label.get_rect(
+                center=(config.width // 2, (config.height // 2) + 45)
+            )
+            self.screen.blit(sub_label, sub_rect)
 
 class InputController:
     """Translates input events into game and board actions."""
@@ -153,18 +164,24 @@ class Game:
         pygame.display.set_caption(config.title)
         self.screen = pygame.display.set_mode(config.display_dimension)
         self.clock = pygame.time.Clock()
-        self.board = Board(config.cols, config.rows, config.num_mines)
-        self.renderer = Renderer(self.screen, self.board)
+        self.board = Board(config.cols, config.rows, config.num_mines, self)
         self.input = InputController(self)
         self.highlight_targets = set()
         self.highlight_until_ms = 0
         self.started = False
         self.start_ticks_ms = 0
         self.end_ticks_ms = 0
+        try:
+            with open(file_path, "r") as f:
+                self.highscore = float(f.read().strip())
+        except:
+            self.highscore = None
+        self._highscore_file = file_path
+        self.renderer = Renderer(self.screen, self.board, self.highscore)
 
     def reset(self):
         """Reset the game state and start a new board."""
-        self.board = Board(config.cols, config.rows, config.num_mines)
+        self.board = Board(config.cols, config.rows, config.num_mines, self)
         self.renderer.board = self.board
         self.highlight_targets.clear()
         self.highlight_until_ms = 0
@@ -226,6 +243,14 @@ class Game:
                 self.input.handle_mouse(event.pos, event.button)
         if (self.board.game_over or self.board.win) and self.started and not self.end_ticks_ms:
             self.end_ticks_ms = pygame.time.get_ticks()
+            if self.board.win:
+                elapsed_ms = self._elapsed_ms()
+                elapsed_sec = elapsed_ms / 1000
+                if self.highscore is None or elapsed_sec < self.highscore:
+                    self.highscore = elapsed_sec
+                    self.renderer.highscore = self.highscore
+                    with open("highscore.txt", "w") as f:
+                        f.write(str(self.highscore))
         self.draw()
         self.clock.tick(config.fps)
         return True
