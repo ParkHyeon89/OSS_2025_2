@@ -25,7 +25,7 @@ num_mines = 40
 # Cell size and margins
 cell_size = 32
 margin_left = 20
-margin_top = 60
+margin_top = 70
 margin_right = 20
 margin_bottom = 20
 
