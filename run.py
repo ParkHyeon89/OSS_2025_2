@@ -187,6 +187,12 @@ class Game:
         seconds = total_seconds % 60
         return f"{minutes:02d}:{seconds:02d}"
 
+    def _format_time_with_seconds(self, ms: int) -> str:
+        """Format milliseconds as 'mm:ss (Xs)'."""
+        base = self._format_time(ms)
+        total_seconds = ms // 1000
+        return f"{base} ({total_seconds}s)"
+
     def _result_text(self) -> str | None:
         """Return result label to display, or None if game continues."""
         if self.board.game_over:
@@ -201,7 +207,8 @@ class Game:
             self.highlight_targets.clear()
         self.screen.fill(config.color_bg)
         remaining = max(0, config.num_mines - self.board.flagged_count())
-        time_text = self._format_time(self._elapsed_ms())
+        elapsed_ms = self._elapsed_ms()
+        time_text = self._format_time_with_seconds(elapsed_ms)
         self.renderer.draw_header(remaining, time_text)
         now = pygame.time.get_ticks()
         for r in range(self.board.rows):
