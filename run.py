@@ -74,7 +74,7 @@ class Renderer:
                 )
         pygame.draw.rect(self.screen, config.color_grid, rect, 1)
 
-    def draw_header(self, remaining_mines: int, time_text: str) -> None:
+    def draw_header(self, remaining_mines: int, time_text: str, difficulty_text: str) -> None:
         """Draw the header bar containing remaining mines and elapsed time."""
         pygame.draw.rect(
             self.screen,
@@ -87,6 +87,12 @@ class Renderer:
         right_label = self.header_font.render(right_text, True, config.color_header_text)
         self.screen.blit(left_label, (10, 12))
         self.screen.blit(right_label, (config.width - right_label.get_width() - 10, 12))
+        diff_label = self.header_font.render(difficulty_text.upper(), True, config.color_result)
+        diff_rect = diff_label.get_rect(
+            center=(config.width // 2, config.margin_top // 2)
+        )
+        self.screen.blit(diff_label, diff_rect)
+
 
     def draw_result_overlay(self, text):
         if not text:
@@ -171,6 +177,20 @@ class Game:
         self.started = False
         self.start_ticks_ms = 0
         self.end_ticks_ms = 0
+        self.difficulty = "normal"
+
+    def reset(self):
+        """Reset the game state and start a new board."""
+        cols, rows, mines = config.DIFFICULTIES[self.difficulty]
+        config.cols = cols
+        config.rows = rows
+        config.num_mines = mines
+        config.width = config.margin_left + cols * config.cell_size + config.margin_right
+        config.height = config.margin_top + rows * config.cell_size + config.margin_bottom
+        config.display_dimension = (config.width, config.height)
+        self.screen = pygame.display.set_mode(config.display_dimension)
+        self.board = Board(cols, rows, mines)
+        self.renderer = Renderer(self.screen, self.board)
         try:
             with open(file_path, "r") as f:
                 self.highscore = float(f.read().strip())
@@ -178,9 +198,7 @@ class Game:
             self.highscore = None
         self._highscore_file = file_path
         self.renderer = Renderer(self.screen, self.board, self.highscore)
-
-    def reset(self):
-        """Reset the game state and start a new board."""
+        
         self.board = Board(config.cols, config.rows, config.num_mines, self)
         self.renderer.board = self.board
         self.highlight_targets.clear()
@@ -225,8 +243,10 @@ class Game:
         self.screen.fill(config.color_bg)
         remaining = max(0, config.num_mines - self.board.flagged_count())
         elapsed_ms = self._elapsed_ms()
+        total_seconds = elapsed_ms // 1000
+        time_text = f"{time_text} ({total_seconds}s)"
+        self.renderer.draw_header(remaining, time_text, self.difficulty)
         time_text = self._format_time_with_seconds(elapsed_ms)
-        self.renderer.draw_header(remaining, time_text)
         now = pygame.time.get_ticks()
         for r in range(self.board.rows):
             for c in range(self.board.cols):
@@ -242,6 +262,15 @@ class Game:
                 return False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
+                    self.reset()
+                if event.key == pygame.K_1:
+                    self.difficulty = "easy"
+                    self.reset()
+                if event.key == pygame.K_2:
+                    self.difficulty = "normal"
+                    self.reset()
+                if event.key == pygame.K_3:
+                    self.difficulty = "hard"
                     self.reset()
                 if event.key == pygame.K_h:
                     if not(self.board.game_over or self.board.win):
