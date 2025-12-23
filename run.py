@@ -71,7 +71,7 @@ class Renderer:
                 )
         pygame.draw.rect(self.screen, config.color_grid, rect, 1)
 
-    def draw_header(self, remaining_mines: int, time_text: str) -> None:
+    def draw_header(self, remaining_mines: int, time_text: str, difficulty_text: str) -> None:
         """Draw the header bar containing remaining mines and elapsed time."""
         pygame.draw.rect(
             self.screen,
@@ -84,6 +84,12 @@ class Renderer:
         right_label = self.header_font.render(right_text, True, config.color_header_text)
         self.screen.blit(left_label, (10, 12))
         self.screen.blit(right_label, (config.width - right_label.get_width() - 10, 12))
+        diff_label = self.header_font.render(difficulty_text.upper(), True, config.color_result)
+        diff_rect = diff_label.get_rect(
+            center=(config.width // 2, config.margin_top // 2)
+        )
+        self.screen.blit(diff_label, diff_rect)
+
 
     def draw_result_overlay(self, text: str | None) -> None:
         """Draw a semi-transparent overlay with centered result text, if any."""
@@ -214,7 +220,7 @@ class Game:
         time_text = self._format_time(elapsed_ms)
         total_seconds = elapsed_ms // 1000
         time_text = f"{time_text} ({total_seconds}s)"
-        self.renderer.draw_header(remaining, time_text)
+        self.renderer.draw_header(remaining, time_text, self.difficulty)
         now = pygame.time.get_ticks()
         for r in range(self.board.rows):
             for c in range(self.board.cols):
