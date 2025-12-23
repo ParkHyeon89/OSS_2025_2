@@ -22,6 +22,9 @@
 H 키를 누르면 아직 열리지 않은 셀 중 안전한 셀 하나를 잠시 하이라이트해 주는 힌트 기능이 제공됩니다.
 게임이 막혔을 때 도움을 받을 수 있는 보조 기능입니다.
 
+<img width="1002" height="109" alt="image" src="https://github.com/user-attachments/assets/f39cd513-14a6-4515-b75e-1399bd83a9cd" />
+
+
 
 3. 타이머 표시 기능
 
@@ -29,18 +32,24 @@ H 키를 누르면 아직 열리지 않은 셀 중 안전한 셀 하나를 잠�
 mm:ss 형식과 함께 전체 경과 시간(초 단위) 이 동시에 표시됩니다.
 게임 종료 시 타이머는 정지됩니다.
 
+<img width="1002" height="186" alt="image" src="https://github.com/user-attachments/assets/daf1c455-a973-4458-880e-7ab241400ad9" />
+
 
 4. 하이스코어 저장 기능
 
 게임에서 승리하면 클리어 시간 중 최단 기록(High Score) 이 파일로 저장됩니다.
 이후 게임에서도 하이스코어가 계속 표시되어 기록 갱신 여부를 확인할 수 있습니다.
 
+<img width="1002" height="154" alt="image" src="https://github.com/user-attachments/assets/8f36e4f9-9a2f-4873-afae-c3a9c1d4d757" />
+
+
 5. 깃발 개수 제한 기능
 
 게임에서 사용할 수 있는 깃발의 개수는 지뢰 개수와 동일하게 제한되어 있습니다.
 플레이어가 깃발을 설치할 때마다 남은 깃발 개수가 감소하며, 헤더 영역에 현재 남은 깃발 수가 실시간으로 표시됩니다.
 
-이를 통해 무분별한 깃발 사용을 방지하고, 지뢰 위치를 더 전략적으로 추론하도록 유도합니다.
+<img width="1002" height="80" alt="image" src="https://github.com/user-attachments/assets/67d0fbd0-f26f-4195-b0b6-9f030da00861" />
+
 
 
 -기본 게임 조작-
