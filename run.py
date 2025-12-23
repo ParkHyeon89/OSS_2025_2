@@ -74,25 +74,30 @@ class Renderer:
                 )
         pygame.draw.rect(self.screen, config.color_grid, rect, 1)
 
+
     def draw_header(self, remaining_mines: int, time_text: str, difficulty_text: str) -> None:
+
         """Draw the header bar containing remaining mines and elapsed time."""
         pygame.draw.rect(
             self.screen,
             config.color_header,
             Rect(0, 0, config.width, config.margin_top - 4),
-        )
-        left_text = f"Mines: {remaining_mines}"
-        right_text = f"Time: {time_text}"
-        left_label = self.header_font.render(left_text, True, config.color_header_text)
-        right_label = self.header_font.render(right_text, True, config.color_header_text)
-        self.screen.blit(left_label, (10, 12))
-        self.screen.blit(right_label, (config.width - right_label.get_width() - 10, 12))
-        diff_label = self.header_font.render(difficulty_text.upper(), True, config.color_result)
-        diff_rect = diff_label.get_rect(
-            center=(config.width // 2, config.margin_top // 2)
-        )
-        self.screen.blit(diff_label, diff_rect)
 
+        mines_text = f"Mines: {remaining_mines}"
+        flags_text = f"Flags: {flags_left}"
+        time_text  = f"Time: {time_text}"
+
+        mines_label = self.header_font.render(mines_text, True, config.color_header_text)
+        flags_label = self.header_font.render(flags_text, True, config.color_header_text)
+        time_label  = self.header_font.render(time_text,  True, config.color_header_text)
+
+        self.screen.blit(mines_label, (10, 12))
+        self.screen.blit(flags_label, (10, 45))
+        self.screen.blit(time_label, (config.width - time_label.get_width() - 10, 12))
+
+        diff_label = self.header_font.render(difficulty_text.upper(), True, config.color_result)
+        diff_rect = diff_label.get_rect(center=(config.width // 2, config.margin_top // 2))
+        self.screen.blit(diff_label, diff_rect)
 
     def draw_result_overlay(self, text):
         if not text:
@@ -241,12 +246,13 @@ class Game:
         if pygame.time.get_ticks() > self.highlight_until_ms and self.highlight_targets:
             self.highlight_targets.clear()
         self.screen.fill(config.color_bg)
-        remaining = max(0, config.num_mines - self.board.flagged_count())
         elapsed_ms = self._elapsed_ms()
         total_seconds = elapsed_ms // 1000
         time_text = f"{time_text} ({total_seconds}s)"
-        self.renderer.draw_header(remaining, time_text, self.difficulty)
+        
         time_text = self._format_time_with_seconds(elapsed_ms)
+        self.renderer.draw_header(remaining, time_text, self.difficulty)
+
         now = pygame.time.get_ticks()
         for r in range(self.board.rows):
             for c in range(self.board.cols):

@@ -61,6 +61,7 @@ class Board:
         self.revealed_count = 0
         self.game_over = False
         self.win = False
+        self.flags_left = mines
         self.parent = parent
 
     def index(self, col: int, row: int) -> int:
@@ -163,13 +164,18 @@ class Board:
     def toggle_flag(self, col: int, row: int) -> None:
         if not self.is_inbounds(col, row):
             return
-
-        cell = self.cells[self.index(col, row)].state
-
-        if cell.is_revealed:
+        
+        st = self.cells[self.index(col, row)].state
+        if st.is_revealed:
             return
-
-        cell.is_flagged = not cell.is_flagged
+        if not st.is_flagged:
+            if self.flags_left == 0:
+                return
+            st.is_flagged = True
+            self.flags_left -=1
+        else:
+            st.is_flagged = False
+            self.flags_left += 1
 
     def flagged_count(self) -> int:
         return sum(cell.state.is_flagged for cell in self.cells)
