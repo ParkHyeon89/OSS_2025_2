@@ -82,6 +82,17 @@ class Board:
                 results.append((nc, nr))
         return results
     
+    def random_safe_cell(self):
+        safe = []
+        for r in range(self.rows):
+            for c in range(self.cols):
+                st = self.cells[self.index(c, r)].state
+                if not st.is_mine and not st.is_flagged and not st.is_revealed:
+                    safe.append((c,r))
+        if not safe:
+            return None
+        return random.choice(safe)
+    
     def place_mines(self, safe_col: int, safe_row: int) -> None:
 
         all_positions = [(c, r) for r in range(self.rows) for c in range(self.cols)]
