@@ -52,7 +52,7 @@ class Board:
     - Toggle flags, check win/lose conditions
     """
 
-    def __init__(self, cols: int, rows: int, mines: int):
+    def __init__(self, cols: int, rows: int, mines: int, parent):
         self.cols = cols
         self.rows = rows
         self.num_mines = mines
@@ -62,6 +62,7 @@ class Board:
         self.game_over = False
         self.win = False
         self.flags_left = mines
+        self.parent = parent
 
     def index(self, col: int, row: int) -> int:
         """Return the flat list index for (col,row)."""
@@ -82,6 +83,17 @@ class Board:
             if self.is_inbounds(nc, nr):
                 results.append((nc, nr))
         return results
+    
+    def random_safe_cell(self):
+        safe = []
+        for r in range(self.rows):
+            for c in range(self.cols):
+                st = self.cells[self.index(c, r)].state
+                if not st.is_mine and not st.is_flagged and not st.is_revealed:
+                    safe.append((c,r))
+        if not safe:
+            return None
+        return random.choice(safe)
     
     def place_mines(self, safe_col: int, safe_row: int) -> None:
 
